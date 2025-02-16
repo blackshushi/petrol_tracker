@@ -7,7 +7,7 @@ class VehicleRecord {
     required this.mileage,
     required this.moneyToFill,
     DateTime? timestamp,
-  }) : this.timestamp = timestamp ?? DateTime.now();
+  }) : timestamp = timestamp ?? DateTime.now();
 
   factory VehicleRecord.fromJson(Map<String, dynamic> json) {
     return VehicleRecord(
@@ -20,20 +20,20 @@ class VehicleRecord {
   static int _parseIntSafely(dynamic value) {
     if (value is int) return value;
     if (value is String) return int.parse(value);
-    throw FormatException('Invalid mileage format');
+    throw const FormatException('Invalid mileage format');
   }
 
   static double _parseDoubleSafely(dynamic value) {
     if (value is double) return value;
     if (value is int) return value.toDouble();
     if (value is String) return double.parse(value);
-    throw FormatException('Invalid moneyToFill format');
+    throw const FormatException('Invalid moneyToFill format');
   }
 
   static DateTime _parseTimestamp(dynamic timestamp) {
     if (timestamp is DateTime) return timestamp;
     if (timestamp is String) return DateTime.parse(timestamp);
-    throw FormatException('Invalid timestamp format');
+    throw const FormatException('Invalid timestamp format');
   }
 
   Map<String, dynamic> toJson() => {

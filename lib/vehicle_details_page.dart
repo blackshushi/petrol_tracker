@@ -6,7 +6,7 @@ import 'vehicle_record.dart';
 class VehicleDetailPage extends StatefulWidget {
   final Vehicle vehicle;
 
-  const VehicleDetailPage({Key? key, required this.vehicle}) : super(key: key);
+  const VehicleDetailPage({super.key, required this.vehicle});
 
   @override
   _VehicleDetailPageState createState() => _VehicleDetailPageState();
@@ -28,7 +28,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
         title: Text(widget.vehicle.name),
       ),
       body: records.isEmpty
-          ? Center(child: Text('No records found'))
+          ? const Center(child: Text('No records found'))
           : ListView.builder(
               itemCount: records.length,
               itemBuilder: (context, index) {
@@ -40,9 +40,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     : 'N/A';
 
                 return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -51,8 +51,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Mileage: ${record.mileage} km',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                              SizedBox(height: 8),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                              const SizedBox(height: 8),
                               Text('Money to fill: \$${record.moneyToFill.toStringAsFixed(2)}'),
                               Text('Date: ${DateFormat('yyyy-MM-dd HH:mm').format(record.timestamp ?? DateTime.now())}'),
                               Text('Distance since last: $distance km'),
@@ -62,13 +62,13 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('Efficiency',
+                            const Text('Efficiency',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             Text('$efficiency km/\$',
-                                style: TextStyle(fontSize: 18, color: Colors.green)),
+                                style: const TextStyle(fontSize: 18, color: Colors.green)),
                             if (index < 2) // Only show delete button for the last two records
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
+                                icon: const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () => _confirmDeleteRecord(context, record),
                               ),
                           ],
@@ -87,15 +87,15 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Confirm Deletion"),
-          content: Text("Are you sure you want to delete this record?"),
+          title: const Text("Confirm Deletion"),
+          content: const Text("Are you sure you want to delete this record?"),
           actions: <Widget>[
             TextButton(
-              child: Text("CANCEL"),
+              child: const Text("CANCEL"),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text("DELETE"),
+              child: const Text("DELETE"),
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteRecord(record);
@@ -113,7 +113,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     });
     widget.vehicle.deleteRecord(record).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Record deleted')),
+        const SnackBar(content: Text('Record deleted')),
       );
     });
   }

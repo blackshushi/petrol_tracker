@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/services.dart' show rootBundle;
-import 'file_system.dart';
 import 'vehicle_record.dart';
 import 'vehicle_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,9 +18,9 @@ class Vehicle {
     required this.model,
     required this.name,
     required this.plateNumber,
-    this.records = const [],
+    List<VehicleRecord>? records,
     this.latestMileage,
-  });
+  }) : records = records ?? [];
 
   List<VehicleRecord> get sortedRecords {
     final sorted = List<VehicleRecord>.from(records);
@@ -86,37 +84,6 @@ class Vehicle {
     await file.writeAsString(jsonString);
   }
 
-  static Future<void> initializeSampleData() async {
-    final vehicles = await loadAllVehicles();
-    if (vehicles.isEmpty) {
-      // Add sample data if the file is empty
-      final sampleVehicles = [
-        Vehicle(
-          vehicleId: "1",
-          model: "Toyota Corolla",
-          name: "Family Car",
-          plateNumber: "ABC123",
-          records: [
-            VehicleRecord(mileage: 1000, moneyToFill: 50),
-            VehicleRecord(mileage: 2000, moneyToFill: 75),
-          ],
-        ),
-        Vehicle(
-          vehicleId: "2",
-          model: "Honda Civic",
-          name: "Work Car",
-          plateNumber: "XYZ789",
-          records: [
-            VehicleRecord(mileage: 500, moneyToFill: 40),
-            VehicleRecord(mileage: 1500, moneyToFill: 60),
-          ],
-        ),
-      ];
-      // Note: This won't actually save to the asset file
-      await saveAllVehicles(sampleVehicles);
-    }
-  }
-
   Future<void> addRecord(VehicleRecord newRecord) async {
     records.add(newRecord);
     updateLatestMileage();
@@ -157,7 +124,7 @@ class Vehicle {
 
   double get averageKmPerMoney {
     if (records.isEmpty) {
-      print('No records for vehicle ${plateNumber}');
+      print('No records for vehicle $plateNumber');
       return 0;
     }
     

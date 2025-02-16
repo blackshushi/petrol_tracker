@@ -3,6 +3,8 @@ import 'vehicle.dart';
 import 'vehicle_record.dart';
 
 class AddRecordPage extends StatefulWidget {
+  const AddRecordPage({super.key});
+
   @override
   _AddRecordPageState createState() => _AddRecordPageState();
 }
@@ -41,7 +43,7 @@ class _AddRecordPageState extends State<AddRecordPage> {
         title: const Text('Add Record'),
         actions: [
           IconButton(
-            icon: Icon(Icons.file_upload),
+            icon: const Icon(Icons.file_upload),
             onPressed: _importData,
           ),
         ],
@@ -64,18 +66,18 @@ class _AddRecordPageState extends State<AddRecordPage> {
                       children: [
                         Text(
                           'Selected Vehicle: ${selectedVehicle!.name}',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
                           'Latest Mileage: ${selectedVehicle!.latestMileage ?? "No records"}',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
                   ),
                 ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               
               // Existing dropdown and form fields
               if (!_isAddingNewVehicle) ...[
@@ -99,6 +101,7 @@ class _AddRecordPageState extends State<AddRecordPage> {
                     setState(() {
                       if (value == 'new_vehicle') {
                         _isAddingNewVehicle = true;
+                        selectedVehicle = null;
                       } else {
                         selectedVehicle = vehicles.firstWhere((v) => v.vehicleId == value);
                       }
@@ -159,17 +162,19 @@ class _AddRecordPageState extends State<AddRecordPage> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _moneyToFillController,
-                decoration:const InputDecoration(labelText: 'Money to Fill'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the money to fill';
-                  }
-                  return null;
-                },
-              ),
+              if(!_isAddingNewVehicle) ...[
+                TextFormField(
+                  controller: _moneyToFillController,
+                  decoration:const InputDecoration(labelText: 'Money to Fill'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the money to fill';
+                    }
+                    return null;
+                  },
+                ),
+              ],
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
@@ -207,13 +212,15 @@ class _AddRecordPageState extends State<AddRecordPage> {
         if (selectedVehicle != null) {
           final newRecord = VehicleRecord(
             mileage: int.parse(_mileageController.text),
-            moneyToFill: double.parse(_moneyToFillController.text),
+            moneyToFill: _moneyToFillController.text.isNotEmpty 
+                ? double.parse(_moneyToFillController.text) 
+                : 0.0, // Return 0.0 if the text is empty
           );
           await selectedVehicle!.addRecord(newRecord);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Record added successfully')),
           );
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         }
       } catch (e, stackTrace) {
         print('Error adding record: $e');
@@ -229,7 +236,7 @@ class _AddRecordPageState extends State<AddRecordPage> {
     try {
       await Vehicle.importData();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Data imported successfully')),
+        const SnackBar(content: Text('Data imported successfully')),
       );
       await _loadVehicles(); // Refresh the vehicle list
     } catch (e) {

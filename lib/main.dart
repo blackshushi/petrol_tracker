@@ -12,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Permission.storage.request(); // Request storage permission on startup
   try {
-    await Vehicle.initializeSampleData();
+    await Vehicle.loadAllVehicles();
   } catch (e) {
     print('Error initializing sample data: $e');
   }
@@ -20,7 +20,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +29,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -58,10 +60,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vehicle Mileage Tracker'),
+        title: const Text('Vehicle Mileage Tracker'),
         actions: [
           IconButton(
-            icon: Icon(Icons.file_download),
+            icon: const Icon(Icons.file_download),
             onPressed: _exportData,
           ),
         ],
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
         future: _vehiclesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -92,9 +94,9 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: Card(
                   elevation: 2,
-                  margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8), // Re-added margin
+                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8), // Re-added margin
                   child: Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -105,19 +107,23 @@ class _HomePageState extends State<HomePage> {
                             child: Icon(Icons.directions_car, color: Colors.blue[800]),
                           ),
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 '${vehicle.plateNumber} (${vehicle.model})',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
                               Text(vehicle.name),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 'Last record: ${vehicle.records.isNotEmpty ? vehicle.records.last.timestamp.toString().split(' ')[0] : 'N/A'}',
+                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                              ),
+                              Text(
+                                'Latest Mileage: ${vehicle.records.isNotEmpty ? vehicle.records.last.mileage.toString() : 'N/A'}',
                                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                               ),
                             ],
@@ -127,16 +133,16 @@ class _HomePageState extends State<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              '${vehicle.averageKmPerMoney.toStringAsFixed(2)}',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              vehicle.averageKmPerMoney.toStringAsFixed(2),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                             ),
-                            Text('\$/km', style: TextStyle(fontSize: 12)),
-                            Text('Records: ${vehicle.records.length}', style: TextStyle(fontSize: 10)),
+                            const Text('\$/km', style: TextStyle(fontSize: 12)),
+                            Text('Records: ${vehicle.records.length}', style: const TextStyle(fontSize: 10)),
                           ],
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () => _confirmDelete(context, vehicle),
                         ),
                       ],
@@ -152,14 +158,14 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddRecordPage()),
+            MaterialPageRoute(builder: (context) => const AddRecordPage()),
           );
           if (result == true) {
             _refreshData(); // Refresh data only if a record was added
           }
         },
-        child: Icon(Icons.add),
         tooltip: 'Add Record',
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -169,15 +175,15 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Confirm Deletion"),
+          title: const Text("Confirm Deletion"),
           content: Text("Are you sure you want to delete ${vehicle.name} and all its records?"),
           actions: <Widget>[
             TextButton(
-              child: Text("CANCEL"),
+              child: const Text("CANCEL"),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text("DELETE"),
+              child: const Text("DELETE"),
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteVehicle(vehicle);
@@ -203,7 +209,7 @@ class _HomePageState extends State<HomePage> {
     try {
       await Vehicle.exportAllData();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Data exported successfully')),
+        const SnackBar(content: Text('Data exported successfully')),
       );
       _refreshData(); // Refresh data after exporting
     } catch (e) {

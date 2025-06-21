@@ -38,7 +38,7 @@ class Vehicle {
   };
 
   factory Vehicle.fromJson(Map<String, dynamic> json) {
-    return Vehicle(
+    final vehicle =  Vehicle(
       vehicleId: json['vehicleId'].toString(),
       model: json['model'].toString(),
       name: json['name'].toString(),
@@ -46,14 +46,20 @@ class Vehicle {
       records: (json['records'] as List?)
           ?.map((r) => VehicleRecord.fromJson(r))
           .toList() ?? [],
-      latestMileage: json['latestMileage'] != null ? int.parse(json['latestMileage'].toString()) : null,
     );
+
+    vehicle.updateLatestMileage();
+
+    return vehicle;
   }
 
   void updateLatestMileage() {
-    if (records.isNotEmpty) {
-      latestMileage = records.map((r) => r.mileage).reduce((a, b) => a > b ? a : b);
+    if (records.isEmpty) {
+      latestMileage = null; // Handle case when there are no records
+      return;
     }
+
+    latestMileage = records.last.mileage;
   }
 
   static Future<List<Vehicle>> loadAllVehicles() async {

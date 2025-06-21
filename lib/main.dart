@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                               vehicle.averageKmPerMoney.toStringAsFixed(2),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                             ),
-                            const Text('\$/km', style: TextStyle(fontSize: 12)),
+                            const Text('\RM/km', style: TextStyle(fontSize: 12)),
                             Text('Records: ${vehicle.records.length}', style: const TextStyle(fontSize: 10)),
                           ],
                         ),

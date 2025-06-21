@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'vehicle.dart';
 import 'vehicle_record.dart';
+import 'add_record_page.dart';
 
 class VehicleDetailPage extends StatefulWidget {
   final Vehicle vehicle;
@@ -79,6 +80,15 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                 );
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddRecordPage(vehicle: widget.vehicle),
+          ),
+        ),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 

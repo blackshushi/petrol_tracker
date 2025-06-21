@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'vehicle.dart';
 import 'vehicle_record.dart';
+import 'vehicle_details_page.dart';
 
 class AddRecordPage extends StatefulWidget {
-  const AddRecordPage({super.key});
+  const AddRecordPage({super.key, this.vehicle}); // Made vehicle optional
+
+  final Vehicle? vehicle; // Added a field to store the optional vehicle
 
   @override
   _AddRecordPageState createState() => _AddRecordPageState();
@@ -23,6 +26,9 @@ class _AddRecordPageState extends State<AddRecordPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.vehicle != null) {
+      selectedVehicle = widget.vehicle; // Initialize with provided vehicle
+    }
     _loadVehicles();
   }
 
@@ -30,8 +36,8 @@ class _AddRecordPageState extends State<AddRecordPage> {
     final loadedVehicles = await Vehicle.loadAllVehicles();
     setState(() {
       vehicles = List<Vehicle>.from(loadedVehicles); // Create a modifiable copy
-      if (vehicles.isNotEmpty) {
-        selectedVehicle = vehicles.first;
+      if (selectedVehicle == null && vehicles.isNotEmpty) {
+        selectedVehicle = vehicles.first; // Default to the first vehicle if none is selected
       }
     });
   }
@@ -57,26 +63,55 @@ class _AddRecordPageState extends State<AddRecordPage> {
             children: [
               // Latest Mileage Display
               if (selectedVehicle != null)
-                Card(
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Selected Vehicle: ${selectedVehicle!.name}',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VehicleDetailPage(vehicle: selectedVehicle!)
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Latest Mileage: ${selectedVehicle!.latestMileage ?? "No records"}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                      ],
+                      );  
+                    },
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.directions_car_rounded, // Replace with any symbol/icon you prefer
+                            size: 48,
+                            color: Colors.blueAccent,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            selectedVehicle!.name,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Latest Mileage: ${selectedVehicle!.latestMileage ?? "N/A"}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              ),
               const SizedBox(height: 16),
               
               // Existing dropdown and form fields
@@ -165,7 +200,7 @@ class _AddRecordPageState extends State<AddRecordPage> {
               if(!_isAddingNewVehicle) ...[
                 TextFormField(
                   controller: _moneyToFillController,
-                  decoration:const InputDecoration(labelText: 'Money to Fill'),
+                  decoration:const InputDecoration(labelText: 'Paid Money'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {

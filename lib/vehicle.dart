@@ -189,38 +189,38 @@ class Vehicle {
       allowedExtensions: ['json'],
     );
 
-    if (result != null) {
-      String filePath = result.files.single.path!;
-      final file = File(filePath);
-      if (await file.exists()) {
-        String contents = await file.readAsString();
-        final data = jsonDecode(contents);
+    if (result == null) {
+      return;
+    }
+
+    String filePath = result.files.single.path!;
+    final file = File(filePath);
+    if (await file.exists()) {
+      String contents = await file.readAsString();
+      final data = jsonDecode(contents);
+      
+      List<Vehicle> allVehicles = await loadAllVehicles();
+      List<Vehicle> newVehicles = [];
+
+      for (var vehicleData in data) {
+        Vehicle vehicle = Vehicle.fromJson(vehicleData);
         
-        List<Vehicle> allVehicles = await loadAllVehicles();
-        List<Vehicle> newVehicles = [];
-
-        for (var vehicleData in data['vehicles']) {
-          Vehicle vehicle = Vehicle.fromJson(vehicleData);
-          
-          int existingIndex = allVehicles.indexWhere((v) => v.vehicleId == vehicle.vehicleId);
-          if (existingIndex != -1) {
-            // Update existing vehicle
-            allVehicles[existingIndex] = vehicle;
-          } else {
-            // Add new vehicle
-            newVehicles.add(vehicle);
-          }
+        int existingIndex = allVehicles.indexWhere((v) => v.vehicleId == vehicle.vehicleId);
+        if (existingIndex != -1) {
+          // Update existing vehicle
+          allVehicles[existingIndex] = vehicle;
+        } else {
+          // Add new vehicle
+          newVehicles.add(vehicle);
         }
-
-        // Add all new vehicles
-        allVehicles.addAll(newVehicles);
-
-        // Save all vehicles
-        await saveAllVehicles(allVehicles);
-        print('Data imported successfully');
       }
-    } else {
-      // User canceled the picker
+
+      // Add all new vehicles
+      allVehicles.addAll(newVehicles);
+
+      // Save all vehicles
+      await saveAllVehicles(allVehicles);
+      print('Data imported successfully');
     }
   }
 }

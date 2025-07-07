@@ -156,13 +156,11 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddRecordPage()),
           );
-          if (result == true) {
-            _refreshData(); // Refresh data only if a record was added
-          }
+          _refreshData();
         },
         tooltip: 'Add Record',
         child: const Icon(Icons.add),

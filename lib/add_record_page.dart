@@ -21,7 +21,9 @@ class _AddRecordPageState extends State<AddRecordPage> {
   final _newVehicleNameController = TextEditingController();
   final _newVehicleModelController = TextEditingController();
   final _newVehiclePlateController = TextEditingController();
+  
   bool _isAddingNewVehicle = false;
+  DateTime _selectedDateTime = DateTime.now();
 
   @override
   void initState() {
@@ -113,7 +115,31 @@ class _AddRecordPageState extends State<AddRecordPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
+              // Date and Time Picker Row
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(
+                        "${_selectedDateTime.year}-${_selectedDateTime.month.toString().padLeft(2, '0')}-${_selectedDateTime.day.toString().padLeft(2, '0')}",
+                      ),
+                      onPressed: _selectDate,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.access_time),
+                      label: Text(
+                        "${_selectedDateTime.hour.toString().padLeft(2, '0')}:${_selectedDateTime.minute.toString().padLeft(2, '0')}",
+                      ),
+                      onPressed: _selectTime,
+                    ),
+                  ),
+                ],
+              ),
               // Existing dropdown and form fields
               if (!_isAddingNewVehicle) ...[
                 DropdownButtonFormField<String>(
@@ -250,6 +276,7 @@ class _AddRecordPageState extends State<AddRecordPage> {
             moneyToFill: _moneyToFillController.text.isNotEmpty 
                 ? double.parse(_moneyToFillController.text) 
                 : 0.0, // Return 0.0 if the text is empty
+            timestamp: _selectedDateTime,
           );
           await selectedVehicle!.addRecord(newRecord);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -279,6 +306,44 @@ class _AddRecordPageState extends State<AddRecordPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to import data: $e')),
       );
+    }
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != _selectedDateTime) {
+      setState(() {
+        _selectedDateTime = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          _selectedDateTime.hour,
+          _selectedDateTime.minute,
+        );
+      });
+    }
+  }
+
+  Future<void> _selectTime() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDateTime = DateTime(
+          _selectedDateTime.year,
+          _selectedDateTime.month,
+          _selectedDateTime.day,
+          picked.hour,
+          picked.minute,
+        );
+      });
     }
   }
 
